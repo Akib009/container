@@ -1,0 +1,22 @@
+trigger:
+- master
+
+jobs:
+  - job: Linux
+    pool: 
+      vmImage: 'Ubuntu 16.04'
+    steps:
+      - task: DotNetCoreInstaller@0
+        inputs:
+          packageType: 'sdk'
+          version: '2.2.401'
+      - script: dotnet build ./SimpleCommerce.sln
+        displayName: 'dornet build'
+      - script: ./run-tests.sh
+        displayName: 'run-test.sh'
+      - task: PublishTestResult@2
+        displayName: Publish Test Result **/*.trx
+        condition: succeededOrFailed()
+        inputs:
+          testResultsFormat: VSTest
+          testResultsFiles: '**/*.trx'
